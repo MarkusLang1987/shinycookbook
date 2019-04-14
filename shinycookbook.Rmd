@@ -11,16 +11,76 @@ output:
 <hr>
 # Preface
 
-The primary reason for me to start this project was to document my own work. I develop professional apps and dashboards with R-Shiny. I work in a small team on these apps and know since my studies how to handle statistics and numbers, but no programming principles like "clean code". With more and more experience, it seems absolutely necessary for me to write documentation of my work instead of searching for hours in old projects for code snippets that I once used. The same is true for Stackoverflow posts, which in my opinion belong in every best practice collection for R-Shiny. I would like to sort them here as well and link them accordingly.
+The primary reason for me to start this project was to document my own work. I develop professional apps and dashboards with R-Shiny. I work in a small team on these apps and know since my studies how to handle statistics and numbers, but no programming principles like "clean code". With more and more experience, it seems absolutely necessary for me to write documentation of my work instead of searching for hours in old projects for code snippets that I once used. 
 
 ## What this book will cover
 
 Although R-Shiny allows you to develop apps without HTML, CSS, and JavaScript knowledge, the real power comes from integrating these technologies. Especially the communication between R and JavaScript makes it possible to create really fantastic apps. <br>In addition to the core technologies there are other languages and tools that make my everyday life easier and bring Shiny to life outside of shinyapps.io: Linux (Shell/Bash), Nginx, Git and some other tools. <br>
-That's why the book doesn't deal with basics anymore, neither in R nor in Shiny, but is mainly meant to help people who already have some experience with R Shiny.
+Therefore, the book does not deal with the basics anymore, neither in R nor in Shiny, but should help people who already have experience with R Shiny. Furthermore, this is not a how-to book, but rather a collection of best practices. In addition to own solutions for problems also links to webinars, articles or Stackoverflow posts are included. If you want to contribute something yourself, be it with code or interesting links just write me a message to langmarkus@hotmail.com.
 
 # Data Wrangling
+This chapter does not deal with the data wrangling itself, but with how to calculate the numbers as quickly as possible from a data set that has already been cleaned up, and how to display them in the dashboard. The reason for this is that R-Shiny applications should always load fast readable and clean data sets, because this is an essential factor for a good performance of the app.
+
 ## Data Wrangling with dplyr
-### Tidy evaluation
+Dashboards are often used to quickly and easily display differences between groups. This workflow perfectly fits to using dplyr, which with its simple pipe syntax allows you to create code that is easy for others to read. 
+
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+result <- mtcars %>%
+  group_by(cyl) %>%
+  summarise(meanmpg = mean(mpg, na.rm = TRUE))
+print(result)
+```
+Easy to write, easy to read! But in Shiny Apps, but often might have to write code like this many times, for example when you want to group by different variables. Maybe you have heard this:
+
+> When you’ve written the same code 3 times, write a function
+>
+> -- <cite>Hadley Wickham</cite>
+
+Nothing easier than this:
+
+```{r, message=FALSE, warning=FALSE, error=TRUE}
+grouped_mean <- function(data, group, sumvar) {
+    result <- data %>%
+        group_by(group) %>%
+        summarise(rumresult = mean(sumvar, na.rm = TRUE))
+    return(result)
+}
+
+grouped_mean(mtcars, cyl, mpg)
+```
+The error shows, that dplyr was not able to find the grouping variable. The reason for this is something called non-standard-evaluation (NSE). This expression is a term that covers everything that does not follow the standard rules of R evaluation. NSE is archieved with meta programming techniques which allow the programmer to manipulate the way R evaluates functions. NSE allows to write code without referring to the dataframe: `group_by(cyl)` instead of `group_by(mtcars$cyl)`. Get more and in depth information about this topic here:
+
+[Advanced R by Hadley Wickham](https://adv-r.hadley.nz/) <br>
+[Metaprogramming in R: Advanced Statistical Programming for Data Science, Analysis and Finance by Thomas Mailund](Wickham]https://www.amazon.de/Metaprogramming-Advanced-Statistical-Programming-Analysis/dp/1484228804/ref=sr_1_1?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&keywords=metaprogramming+r&qid=1555258801&s=gateway&sr=8-1)
+
+This ease of use comes with the drawback that dplyr is refencially not transparent. For functions you just could use base R functions, but dplyr also preserves functions which use standard evaluation.
+
+### NSE and Tidy evaluation
+Before version 0.8.0 most dplyr functions had a "_" equivalent. Since dplyr 0.8.0 there is a new and easier option to use dplyr code in custom functions. dplyr 0.8.0 allows to use something called tidy evaluation. The key principle behind tidy evaluation, instead of evaluating the arguments, is to quote arguments which refer to data frame columns and unquote them in the process. 
+
+Quoting a variable is archieved with the `enquo()` function. The quoted arguments get passed to the function get passed to the function and will get evaluated when being unquoted with `!!`
+
+```{r, message=FALSE, warning=FALSE}
+grouped_mean <- function(data, group, sumvar) {
+    
+    group <- enquo(group)
+    sumvar <- enquo(sumvar)
+  
+    result <- data %>%
+        group_by(!!group) %>%
+        summarise(sumresult = mean(!!sumvar, na.rm = TRUE))
+    return(result)
+}
+
+grouped_mean(mtcars, cyl, mpg)
+```
+
+This works perfectly fine and allows you to get rid of repetitive code. The topic tidy evaluation is of course much more extensive than what was shown in this chapter. Further information on this topic can be found here:
+
+[dplyr 0.8.0 documentation](https://dplyr.tidyverse.org/articles/programming.html#quoting) <br>
+[Tidy evaluation by Hadley Wickham](https://tidyeval.tidyverse.org/index.html)
 
 # Interactive Data Visualisation
 
