@@ -1,0 +1,56 @@
+---
+title: "R Shiny Cookbook"
+author: "Markus Lang"
+site: bookdown::bookdown_site
+documentclass: book
+output:
+  bookdown::gitbook: default
+  #bookdown::pdf_book: default
+---
+
+<hr>
+# Preface
+
+The primary reason for me to start this project was to document my own work. I develop professional apps and dashboards with R-Shiny. I work in a small team on these apps and know since my studies how to handle statistics and numbers, but no programming principles like "clean code". With more and more experience, it seems absolutely necessary for me to write documentation of my work instead of searching for hours in old projects for code snippets that I once used. The same is true for Stackoverflow posts, which in my opinion belong in every best practice collection for R-Shiny. I would like to sort them here as well and link them accordingly.
+
+## What this book will cover
+
+Although R-Shiny allows you to develop apps without HTML, CSS, and JavaScript knowledge, the real power comes from integrating these technologies. Especially the communication between R and JavaScript makes it possible to create really fantastic apps. <br>In addition to the core technologies there are other languages and tools that make my everyday life easier and bring Shiny to life outside of shinyapps.io: Linux (Shell/Bash), Nginx, Git and some other tools. <br>
+That's why the book doesn't deal with basics anymore, neither in R nor in Shiny, but is mainly meant to help people who already have some experience with R Shiny.
+
+# Data Wrangling
+## Data Wrangling with dplyr
+### Tidy evaluation
+
+# Interactive Data Visualisation
+
+R has long offered one of the best visualization packages for data science - ggplot by Hadley Wickham. As nice and easy as it is to use, the expectation of users on websites is that you can interact with the graphics. Many libraries have been written with JavaScript for this purpose, and many R-wrappers have been written for them. In my personal opinion the best visualization package is HighcharteR. It is a wrapper for Highcharts.js and allows to create very nice visualizations quickly and easily, which still have a lot of possibilities to customize the output. The documentation of the website is really excellent. Unfortunately highcharts does not offer a crossfilter option, but with a workaround JavaScript this function can be emulated to a certain degree. 
+
+
+## The highcharter Package
+The Highcharter Package was written by JbKunst (thanks a lot for that!). The following would like to show different types of charts.
+
+### Barchart
+
+### Scatterplot
+
+### Linechart
+
+# HTML
+
+# CSS
+
+# Bootstrap
+
+# JavaScript
+
+# Git
+
+# Linux Basics
+
+# Deploy Shiny apps on your own website
+
+
+
+
+<!-- If you need PDF output, uncomment bookdown::pdf_book above in YAML. You will need a LaTeX installation, e.g., https://yihui.name/tinytex/ -->
