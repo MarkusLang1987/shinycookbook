@@ -107,6 +107,152 @@ The Highcharter Package was written by JbKunst (thanks a lot for that!). The fol
 # Git
 
 # Linux Basics
+To be able to offer R-Shiny dashboards to customers or use it for your own portfolio website without having the .shinyapps.io extension, it is worthwhile to buy your own domain and a web server (in 2019 a good investment for everyone in tech). Domains are available for 20 dollar per year, a webserver is available from 5 dollar per month. I personally use and recommend digitalocean because the server is very easy to use and a complete virtual machine can be set up within a few minutes.
+
+## Set up R-Shiny on a Linux Ubuntu 18.04 VM
+First thing to do on your vm is to set up a non root-user.
+```console
+adduser markus
+gpasswd -a markus sudo
+
+su - markus
+```
+
+Simple rule - never use root user to manipulate anything on your server. Always use a "superuser".
+
+Next Step is to install a webserver, where shiny apps can run. The two most popular are apache and nginx. Nginx seems to be better suited and better documented in combination with shiny.
+```console
+sudo apt-get update
+sudo apt-get -y install nginx
+```
+
+Nginx works as a service. The most often used commands are start, stop and restart which should be selfexplanatory. Before installing R, you have to add the KEY and Repository
+
+```console
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/'
+sudo apt update
+```
+
+Now install R
+```console
+sudo apt install r-base
+```
+To see if everything worked fine, start R:
+```console
+sudo R
+```
+## Installing packages
+I recommend to never install packages inside R, but always from the command line. Reason for this is that packages should be available to every user. When you install packages in R, they will be saved in the personal library and others users can not use them. So always install the packages with ```console sudo su```
+
+Now install shiny with the following command:
+
+```console
+sudo su - -c "R -e \"install.packages('shiny, repos='http://cran.rstudio.com/')\""
+```
+
+Now get the latest version of shiny server:
+
+```console
+wget https://download3.rstudio.org/ubuntu-12.04/x86_64/shiny-server-1.5.6.875-amd64.deb
+sudo gdebi shiny-server-1.5.6.875-amd64.deb
+```
+
+
+## Use Linux to automatically send reports
+Linux can offer great opporunities to run scripts from a scheduler called cron that allows you to execute scripts at repeating points in time. This is great for pulling data from API´s and writing it to a database that will be accessed by an app the next day. Even things like server updates can be moved to times of day where they don't get in touch with active users. Cron is preinstalled and can be accessed with:
+```console
+crontab -e
+```
+
+Cron commands look liket his
+```console
+0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+```
+This websites helps you with the settings how often you want to call a cron job:
+https://crontab.guru/every-10-minutes
+
+Some issues which caused me a headache when my scripts were not executed, but worked when i executed them from the command line:
+- Permission: You always have set the settings to allow the script being executed. The following command allows the current user to read, write and execute the file.
+```console
+sudo chmod 777 /path/script.R
+```
+Another big issue was abouts paths: It seems to be a good solution to always use absolute paths if you want to run cron (point to the folder where your script lives). 
+
+```console 
+# Bad
+*/30 * * * * script.sh > listener2.log 2>&1
+# Good
+*/30 * * * * /bin/sh /home/markus/Spielplatz/script.sh > /tmp/listener2.log 2>&
+```
+The problem with cron is that errors are silent, so check these two issues first if your script does not work as expected. There might be other problems of course, but I do not use cron so often to be familiar with all of then.
+
+## Daily reports with mails (Gmail):
+
+Sometimes it´s more suitable to send reports to your clients, may it be on a daily, weekly or monthly basis. 
+To create a report, you need a markdown.Rmd file and a second file (script.R), whichs calls the second markdown file. Here is a basic example how this works, both codes worked fine in my example.
+
+```{r, eval=FALSE, error=FALSE} 
+library(knitr)
+library(rmarkdown)
+
+knit(input = "/home/user/stockreport.Rmd") 
+render(input = "/home/user/stockreport.Rmd", output_format = "html_document", output_dir = "/home/user")
+```
+The R Markdown gets rendered and stored in the output_dir. If you want to send it automatically to somebody, you need a tool or library that can be used from cron. I tested tools inside the linux world like Sendmail and postfix, but I was not a able to get it work. Same applied for the sendMailR Package. 
+
+One important thing to do is to allow less secure apps get access to your mail account, which you can do here:
+https://myaccount.google.com/lesssecureapps
+
+I managed to get this code working with the following python script:
+
+```python
+#!/usr/bin/env python3
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+
+email_user = 'youownmail@gmail.com'
+email_password = 'password'
+email_send = 'theothersmail.com'
+
+subject = 'yourreport'
+
+msg = MIMEMultipart()
+msg['From'] = email_user
+msg['To'] = email_send
+msg['Subject'] = subject
+
+body = 'Wuffi!'
+msg.attach(MIMEText(body,'plain'))
+
+filename='/home/user/stockreport.html'
+attachment  =open(filename,'rb')
+
+part = MIMEBase('application','octet-stream')
+part.set_payload((attachment).read())
+encoders.encode_base64(part)
+part.add_header('Content-Disposition',"attachment; filename= "+ filename)
+
+msg.attach(part)
+text = msg.as_string()
+server = smtplib.SMTP('smtp.gmail.com',587)
+server.starttls()
+server.login(email_user,email_password)
+
+server.sendmail(email_user,email_send,text)
+server.quit()
+
+print("script done")
+```
+
+Run this script from cron and y
+
+# Deploy Shiny apps on your own website
+<!-- If you need PDF output, uncomment bookdown::pdf_book above in YAML. You will need a LaTeX installation, e.g., https://yihui.name/tinytex/ -->
 
 # Deploy Shiny apps on your own website
 
