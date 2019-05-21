@@ -120,6 +120,9 @@ https://git-scm.com/downloads Download Git here to be able to use the git bash.
 8. Run ```git commit -m "This is an update"``` to update the repo with a comment.
 9. Push update to github: ```git push```
 
+If there is an error with the upstream, add the repo with this command ```git remote add origin git@github.com:yourusername/yourrepository.git```
+Then use ```git push --set-upstream origin master```. From how on ```git push``` should be sufficient.
+
 
 # Linux Basics
 To be able to offer R-Shiny dashboards to customers or use it for your own portfolio website without having the .shinyapps.io extension, it is worthwhile to buy your own domain and a web server (in 2019 a good investment for everyone in tech). Domains are available for 20 dollar per year, a webserver is available from 5 dollar per month. I personally use and recommend digitalocean because the server is very easy to use and a complete virtual machine can be set up within a few minutes.
