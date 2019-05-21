@@ -106,6 +106,21 @@ The Highcharter Package was written by JbKunst (thanks a lot for that!). The fol
 
 # Git
 
+## Git is a version control system that allows you to track changes with time points and to work on the same project with different people regardless of location. Git is an absolute prerequisite in the industry and is being adapted more and more in the field of data science. This chapters how to install and use git.
+
+https://git-scm.com/downloads Download Git here to be able to use the git bash.
+
+1. Open command line 
+2. Go to project folder with ```cd``` or ```pushd```: ```git init``` => Initialize an invisible .git file (without it, you can not use git)
+3. Go to your github repository and copy the link: https://github.com/MarkusLang1987/shinycookbook.git
+4. ```git pull https://github.com/MarkusLang1987/shinycookbook.git``` to get the repo on your computer
+5. Create another branch than the master branch: ```git branch newfeature```
+6. Run ```git status``` to see which files changed.
+7. Run ```git add -A``` to update all files which were changed.
+8. Run ```git commit -m "This is an update"``` to update the repo with a comment.
+9. Push update to github: ```git push```
+
+
 # Linux Basics
 To be able to offer R-Shiny dashboards to customers or use it for your own portfolio website without having the .shinyapps.io extension, it is worthwhile to buy your own domain and a web server (in 2019 a good investment for everyone in tech). Domains are available for 20 dollar per year, a webserver is available from 5 dollar per month. I personally use and recommend digitalocean because the server is very easy to use and a complete virtual machine can be set up within a few minutes.
 
@@ -226,7 +241,7 @@ msg['From'] = email_user
 msg['To'] = email_send
 msg['Subject'] = subject
 
-body = 'Wuffi!'
+body = 'This is a Stockreport'
 msg.attach(MIMEText(body,'plain'))
 
 filename='/home/user/stockreport.html'
